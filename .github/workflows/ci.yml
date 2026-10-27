@@ -1,0 +1,30 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      # every gallery scene must still validate and render
+      # gallery scenes describe other repos: validate them, don't drift-check them against this one
+      - run: for f in gallery/*.json; do node dist/src/bin.js check "$f" --no-drift; done
+      # repoland's own map must match this repo
+      - run: node dist/src/bin.js check repoland.json
+      - run: npm run web:build

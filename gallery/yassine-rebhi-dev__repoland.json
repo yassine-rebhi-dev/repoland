@@ -1,0 +1,233 @@
+{
+  "title": "repoland",
+  "subtitle": "Maps a codebase as a town, and keeps the map true",
+  "groups": [
+    {
+      "id": "agent",
+      "label": "Agent side"
+    },
+    {
+      "id": "core",
+      "label": "Engine"
+    },
+    {
+      "id": "out",
+      "label": "Outputs"
+    }
+  ],
+  "ignore": [
+    "test/**",
+    "examples/**"
+  ],
+  "nodes": [
+    {
+      "id": "you",
+      "label": "You",
+      "kind": "user",
+      "group": "agent"
+    },
+    {
+      "id": "agent",
+      "label": "Coding agent",
+      "kind": "model",
+      "note": "Claude Code, Codex, …",
+      "group": "agent",
+      "description": "Reads the repo and writes repoland.json, starting from the scan and following the skill."
+    },
+    {
+      "id": "skill",
+      "label": "repoland skill",
+      "kind": "library",
+      "note": "SKILL.md",
+      "group": "agent",
+      "paths": [
+        "skills/**"
+      ],
+      "description": "Instructions shipped in the npm package: start from scan, refine from code, tie parts to paths, check."
+    },
+    {
+      "id": "cli",
+      "label": "CLI",
+      "kind": "cli",
+      "note": "render, scan, check, impact",
+      "group": "core",
+      "paths": [
+        "src/cli.ts",
+        "src/bin.ts",
+        "src/meta.ts"
+      ],
+      "description": "Every command; zero runtime dependencies."
+    },
+    {
+      "id": "mcp",
+      "label": "MCP server",
+      "kind": "service",
+      "note": "tools for agents",
+      "group": "agent",
+      "paths": [
+        "src/mcp.ts"
+      ],
+      "description": "stdio JSON-RPC: which part owns a file, dependents, impact, drift."
+    },
+    {
+      "id": "scene",
+      "label": "Scene format",
+      "kind": "library",
+      "note": "validation with JSON paths",
+      "group": "core",
+      "paths": [
+        "src/scene.ts",
+        "src/glob.ts"
+      ]
+    },
+    {
+      "id": "scan",
+      "label": "Scanner",
+      "kind": "service",
+      "note": "compose, workspaces, deps",
+      "group": "core",
+      "paths": [
+        "src/scan.ts",
+        "src/repo.ts"
+      ],
+      "description": "Drafts a map with no LLM from what the repo declares."
+    },
+    {
+      "id": "checks",
+      "label": "Drift, impact, insights",
+      "kind": "service",
+      "note": "map vs code, git, CODEOWNERS",
+      "group": "core",
+      "paths": [
+        "src/drift.ts",
+        "src/impact.ts",
+        "src/insights.ts"
+      ]
+    },
+    {
+      "id": "layout",
+      "label": "Layout engine",
+      "kind": "service",
+      "note": "layers, routing",
+      "group": "core",
+      "paths": [
+        "src/layout.ts"
+      ],
+      "description": "Deterministic: same scene, same picture."
+    },
+    {
+      "id": "svg",
+      "label": "SVG renderer",
+      "kind": "worker",
+      "note": "SVG + Mermaid",
+      "group": "out",
+      "paths": [
+        "src/render.ts",
+        "scripts/**",
+        "src/mermaid.ts"
+      ]
+    },
+    {
+      "id": "viewer",
+      "label": "3D explorer",
+      "kind": "frontend",
+      "note": "three.js, one HTML file",
+      "group": "out",
+      "paths": [
+        "viewer/**",
+        "src/html.ts"
+      ]
+    },
+    {
+      "id": "site",
+      "label": "Website",
+      "kind": "frontend",
+      "note": "gallery + live editor",
+      "group": "out",
+      "paths": [
+        "web/**"
+      ]
+    },
+    {
+      "id": "gallery",
+      "label": "Gallery",
+      "kind": "storage",
+      "note": "real projects",
+      "group": "out",
+      "paths": [
+        "gallery/**",
+        "docs/gallery/**"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "you",
+      "to": "agent",
+      "label": "map this repo"
+    },
+    {
+      "from": "agent",
+      "to": "skill",
+      "label": "follows"
+    },
+    {
+      "from": "agent",
+      "to": "cli",
+      "label": "runs"
+    },
+    {
+      "from": "cli",
+      "to": "scan"
+    },
+    {
+      "from": "cli",
+      "to": "scene",
+      "label": "validate"
+    },
+    {
+      "from": "cli",
+      "to": "checks"
+    },
+    {
+      "from": "checks",
+      "to": "scan",
+      "label": "baseline"
+    },
+    {
+      "from": "cli",
+      "to": "svg"
+    },
+    {
+      "from": "cli",
+      "to": "viewer",
+      "label": "--html"
+    },
+    {
+      "from": "svg",
+      "to": "layout"
+    },
+    {
+      "from": "viewer",
+      "to": "layout"
+    },
+    {
+      "from": "site",
+      "to": "viewer"
+    },
+    {
+      "from": "site",
+      "to": "gallery"
+    },
+    {
+      "from": "agent",
+      "to": "mcp",
+      "label": "asks"
+    },
+    {
+      "from": "mcp",
+      "to": "checks"
+    }
+  ],
+  "source": "this repository (repoland.json, checked in CI)"
+}

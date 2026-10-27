@@ -1,0 +1,27 @@
+{
+  "title": "uv",
+  "subtitle": "An extremely fast Python package and project manager, written in Rust",
+  "source": "README.md (projects, lockfile, global cache, Python versions, tools, pip interface)",
+  "nodes": [
+    { "id": "you", "label": "You", "kind": "user" },
+    { "id": "cli", "label": "uv", "kind": "cli", "note": "add, sync, run, pip, tool" },
+    { "id": "resolver", "label": "Resolver", "kind": "service", "note": "picks compatible versions" },
+    { "id": "lock", "label": "uv.lock", "kind": "storage", "note": "universal lockfile" },
+    { "id": "installer", "label": "Installer", "kind": "worker", "note": "builds the environment" },
+    { "id": "cache", "label": "Global cache", "kind": "cache", "note": "shared across projects" },
+    { "id": "pypi", "label": "PyPI", "kind": "external", "note": "package index" },
+    { "id": "python", "label": "Python builds", "kind": "external", "note": "managed interpreters" },
+    { "id": "venv", "label": ".venv", "kind": "storage", "note": "project environment" }
+  ],
+  "edges": [
+    { "from": "you", "to": "cli" },
+    { "from": "cli", "to": "resolver", "label": "uv lock" },
+    { "from": "resolver", "to": "pypi", "label": "metadata" },
+    { "from": "resolver", "to": "lock", "label": "writes" },
+    { "from": "cli", "to": "installer", "label": "uv sync" },
+    { "from": "installer", "to": "cache" },
+    { "from": "cache", "to": "pypi", "label": "download" },
+    { "from": "installer", "to": "python" },
+    { "from": "installer", "to": "venv", "label": "link" }
+  ]
+}

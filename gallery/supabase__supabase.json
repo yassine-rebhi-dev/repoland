@@ -1,0 +1,33 @@
+{
+  "title": "supabase",
+  "subtitle": "Postgres development platform: the open source tools behind it",
+  "source": "README.md, section 'How it works / Architecture'",
+  "nodes": [
+    { "id": "app", "label": "Your app", "kind": "user" },
+    { "id": "sdk", "label": "Client libraries", "kind": "library", "note": "supabase-js and others" },
+    { "id": "studio", "label": "Dashboard", "kind": "frontend", "note": "Supabase Studio" },
+    { "id": "gateway", "label": "API gateway", "kind": "service", "note": "Envoy" },
+    { "id": "auth", "label": "Auth", "kind": "service", "note": "GoTrue, JWT" },
+    { "id": "rest", "label": "REST API", "kind": "service", "note": "PostgREST" },
+    { "id": "realtime", "label": "Realtime", "kind": "service", "note": "Elixir, websockets" },
+    { "id": "storage", "label": "Storage API", "kind": "service", "note": "files, Postgres permissions" },
+    { "id": "meta", "label": "postgres-meta", "kind": "service", "note": "manage tables and roles" },
+    { "id": "pg", "label": "Postgres", "kind": "database", "note": "with pg_graphql" },
+    { "id": "s3", "label": "S3", "kind": "external", "note": "object storage" }
+  ],
+  "edges": [
+    { "from": "app", "to": "sdk" },
+    { "from": "sdk", "to": "gateway", "label": "HTTPS" },
+    { "from": "studio", "to": "meta" },
+    { "from": "gateway", "to": "auth" },
+    { "from": "gateway", "to": "rest" },
+    { "from": "gateway", "to": "realtime", "label": "websockets" },
+    { "from": "gateway", "to": "storage" },
+    { "from": "auth", "to": "pg" },
+    { "from": "rest", "to": "pg", "label": "SQL" },
+    { "from": "realtime", "to": "pg", "label": "replication" },
+    { "from": "storage", "to": "s3", "label": "files" },
+    { "from": "storage", "to": "pg" },
+    { "from": "meta", "to": "pg" }
+  ]
+}

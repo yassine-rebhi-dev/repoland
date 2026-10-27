@@ -1,0 +1,23 @@
+{
+  "title": "ollama",
+  "subtitle": "Run open models locally",
+  "source": "README.md (install, REST API, model library, integrations, llama.cpp credit)",
+  "nodes": [
+    { "id": "you", "label": "You", "kind": "user" },
+    { "id": "cli", "label": "ollama CLI", "kind": "cli", "note": "run, pull, create" },
+    { "id": "apps", "label": "Apps and agents", "kind": "frontend", "note": "Claude Code, Codex, chat UIs" },
+    { "id": "server", "label": "Ollama server", "kind": "service", "note": "REST API on :11434" },
+    { "id": "engine", "label": "Inference engine", "kind": "model", "note": "built on llama.cpp / ggml" },
+    { "id": "models", "label": "Local models", "kind": "storage", "note": "weights + Modelfiles" },
+    { "id": "library", "label": "ollama.com/library", "kind": "external", "note": "model registry" }
+  ],
+  "edges": [
+    { "from": "you", "to": "cli", "label": "ollama run" },
+    { "from": "cli", "to": "server" },
+    { "from": "apps", "to": "server", "label": "/api/chat" },
+    { "from": "server", "to": "library", "label": "pull" },
+    { "from": "server", "to": "models", "label": "store" },
+    { "from": "server", "to": "engine", "label": "load + generate" },
+    { "from": "engine", "to": "models", "label": "read weights" }
+  ]
+}

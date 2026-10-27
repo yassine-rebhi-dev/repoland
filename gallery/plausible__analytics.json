@@ -1,0 +1,24 @@
+{
+  "title": "plausible",
+  "subtitle": "Privacy-first, cookie-free web analytics",
+  "source": "README.md; community-edition compose.yml (postgres, clickhouse, plausible)",
+  "nodes": [
+    { "id": "visitor", "label": "Website visitor", "kind": "user" },
+    { "id": "script", "label": "Tracking script", "kind": "frontend", "note": "tiny, no cookies" },
+    { "id": "app", "label": "Plausible app", "kind": "service", "note": "events API + stats API" },
+    { "id": "events", "label": "Events DB", "kind": "database", "note": "ClickHouse" },
+    { "id": "pg", "label": "App DB", "kind": "database", "note": "Postgres: sites, users" },
+    { "id": "dash", "label": "Dashboard", "kind": "frontend", "note": "shareable stats" },
+    { "id": "owner", "label": "Site owner", "kind": "user" },
+    { "id": "reports", "label": "Email and Slack", "kind": "external", "note": "weekly reports, spike alerts" }
+  ],
+  "edges": [
+    { "from": "visitor", "to": "script", "label": "page view" },
+    { "from": "script", "to": "app", "label": "events API" },
+    { "from": "app", "to": "events", "label": "write" },
+    { "from": "app", "to": "pg" },
+    { "from": "owner", "to": "dash" },
+    { "from": "dash", "to": "app", "label": "query stats" },
+    { "from": "app", "to": "reports" }
+  ]
+}

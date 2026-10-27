@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>repoland: your codebase as a 3D world</title>
+    <meta name="description" content="Your coding agent maps the repo, repoland draws it: an isometric illustration of how your project works, ready for your README." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="wrap">
+        <h1>Your codebase, as a little world.</h1>
+        <p class="lede">
+          repoland maps the moving parts of a repo and builds them as a town you can explore: services are buildings,
+          databases are tanks, data flows through pipes. Then it keeps the map honest in CI and shows what every pull
+          request touches.
+        </p>
+        <div class="start">
+          <pre><code>npx repoland skill</code></pre>
+          <p>then ask Claude Code: <q>map this repo with repoland</q></p>
+        </div>
+      </div>
+      <figure class="hero" id="hero" aria-label="immich, explorable in 3D: drag to orbit, click a building"></figure>
+    </header>
+
+    <main class="wrap">
+      <section aria-labelledby="gallery-title">
+        <h2 id="gallery-title">Real projects, drawn from their own docs</h2>
+        <p class="sub">Each map was written by an agent following the repoland skill, using only what the project documents. Pick one to open it in the editor.</p>
+        <div class="gallery" id="gallery"></div>
+      </section>
+
+      <section class="team" aria-labelledby="team-title">
+        <h2 id="team-title">A map that stays true</h2>
+        <p class="sub">Architecture diagrams rot because nothing checks them. repoland ties every part to the code it owns.</p>
+        <dl class="features">
+          <div><dt>Draft a map in seconds, no AI needed</dt><dd>Reads docker-compose, workspaces, Cargo and Go modules, and the databases, queues and APIs your dependencies imply.</dd><dd><code>npx repoland scan</code></dd></div>
+          <div><dt>Fail CI when the map drifts</dt><dd>A part whose code was deleted, or a new service nobody drew: <code>check</code> exits 1 and says which.</dd><dd><code>npx repoland check</code></dd></div>
+          <div><dt>See what a pull request touches</dt><dd>Changed files light up their buildings in red, everything that depends on them in amber. Post the summary as a PR comment.</dd><dd><code>npx repoland impact --md</code></dd></div>
+          <div><dt>Share an explorable 3D map</dt><dd>One self-contained HTML file: orbit, search, click a part to see its code paths and connections. Works offline.</dd><dd><code>npx repoland --html</code></dd></div>
+        </dl>
+      </section>
+
+      <section class="play" aria-labelledby="play-title">
+        <h2 id="play-title">Edit a map</h2>
+        <p class="sub">Change the JSON and the town redraws as you type. Nothing leaves your browser.</p>
+        <div class="views" role="group" aria-label="View">
+          <button type="button" data-view="2d" aria-pressed="true">2D picture</button>
+          <button type="button" data-view="3d" aria-pressed="false">3D explorer</button>
+        </div>
+        <div class="editor">
+          <div class="pane">
+            <label for="json" class="visually-hidden">Scene JSON</label>
+            <textarea id="json" spellcheck="false"></textarea>
+            <p id="errors" class="errors" role="status" aria-live="polite"></p>
+          </div>
+          <div class="pane preview" id="preview"></div>
+        </div>
+        <div class="actions">
+          <button type="button" id="download">Download SVG</button>
+          <button type="button" id="copy" class="quiet">Copy README line</button>
+        </div>
+      </section>
+
+      <section class="how" aria-labelledby="how-title">
+        <h2 id="how-title">How it works</h2>
+        <ol>
+          <li><strong>Install the skill</strong> with <code>npx repoland skill</code>. It teaches your agent to read the README, manifests, compose files and entry points, and to include only parts that really exist.</li>
+          <li><strong>Your agent writes <code>repoland.json</code></strong>: 5 to 16 parts, each with a kind (service, database, queue…), and the flows between them.</li>
+          <li><strong>repoland lays it out and draws it.</strong> Layers follow the data flow, pipes route around buildings, busy hubs stand taller. Same input, same picture, every time.</li>
+        </ol>
+        <p>Using Codex, Cursor or another agent? Run <code>npx repoland skill --print</code> and paste the instructions.</p>
+      </section>
+    </main>
+
+    <footer class="wrap foot">
+      <a href="https://github.com/yassine-rebhi-dev/repoland">Source on GitHub</a>
+      <span>MIT licensed · zero runtime dependencies</span>
+    </footer>
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

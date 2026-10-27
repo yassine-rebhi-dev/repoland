@@ -1,0 +1,201 @@
+{
+  "title": "immich",
+  "subtitle": "Self-hosted photo and video backup",
+  "source": "docs/docs/developer/architecture.mdx, docker/docker-compose.yml, repository tree",
+  "groups": [
+    {
+      "id": "clients",
+      "label": "Clients"
+    },
+    {
+      "id": "backend",
+      "label": "Server"
+    },
+    {
+      "id": "data",
+      "label": "Data"
+    },
+    {
+      "id": "ml",
+      "label": "Machine learning"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "you",
+      "label": "You",
+      "kind": "user",
+      "group": "clients"
+    },
+    {
+      "id": "mobile",
+      "label": "Mobile app",
+      "kind": "frontend",
+      "note": "Flutter, Android + iOS",
+      "group": "clients",
+      "paths": [
+        "mobile/**"
+      ],
+      "description": "Dart/Flutter app with a local Isar database and Riverpod state. Talks to the server through a client generated from the OpenAPI spec."
+    },
+    {
+      "id": "web",
+      "label": "Web app",
+      "kind": "frontend",
+      "note": "SvelteKit",
+      "group": "clients",
+      "paths": [
+        "web/**"
+      ],
+      "description": "TypeScript + SvelteKit + Tailwind. Uses the same OpenAPI-generated REST client as the other clients."
+    },
+    {
+      "id": "cli",
+      "label": "immich CLI",
+      "kind": "cli",
+      "note": "bulk upload",
+      "group": "clients",
+      "paths": [
+        "packages/cli/**"
+      ],
+      "description": "npm package for controlling an instance from the terminal, mostly bulk uploads, via the REST API."
+    },
+    {
+      "id": "server",
+      "label": "immich-server",
+      "kind": "service",
+      "note": "Nest.js REST API",
+      "group": "backend",
+      "paths": [
+        "server/src/controllers/**",
+        "server/src/services/**",
+        "server/src/repositories/**"
+      ],
+      "description": "Nest.js on Node with Express and Kysely. Controllers map HTTP endpoints; business logic lives in services, technology-specific code in repositories (hexagonal style)."
+    },
+    {
+      "id": "redis",
+      "label": "Job queue",
+      "kind": "queue",
+      "note": "Redis / Valkey",
+      "group": "backend",
+      "description": "Queue management for background jobs."
+    },
+    {
+      "id": "jobs",
+      "label": "Background jobs",
+      "kind": "worker",
+      "note": "thumbnails, metadata, video",
+      "group": "backend",
+      "paths": [
+        "server/src/workers/**",
+        "server/src/services/job.service.ts",
+        "server/src/services/media.service.ts",
+        "server/src/services/metadata.service.ts"
+      ],
+      "description": "Thumbnail generation, metadata extraction, video transcoding, smart search, facial recognition, storage template migration, sidecars."
+    },
+    {
+      "id": "ml",
+      "label": "Machine learning",
+      "kind": "model",
+      "note": "Python FastAPI: search, faces",
+      "group": "ml",
+      "paths": [
+        "machine-learning/**"
+      ],
+      "description": "Separate Python/FastAPI container so it can run on other hardware or be disabled. Each request carries the model task and model name; settings live in Postgres."
+    },
+    {
+      "id": "db",
+      "label": "Postgres",
+      "kind": "database",
+      "note": "data + vector search",
+      "group": "data",
+      "paths": [
+        "server/src/schema/**"
+      ],
+      "description": "Persistent data storage, including vector search for smart search."
+    },
+    {
+      "id": "files",
+      "label": "Photo library",
+      "kind": "storage",
+      "note": "upload folder on disk",
+      "group": "data",
+      "description": "Originals, thumbnails and transcoded videos on the file system."
+    },
+    {
+      "id": "email",
+      "label": "Email",
+      "kind": "external",
+      "note": "notifications (SMTP)",
+      "group": "backend",
+      "description": "Outgoing email notifications, sent from the server."
+    }
+  ],
+  "edges": [
+    {
+      "from": "you",
+      "to": "mobile"
+    },
+    {
+      "from": "you",
+      "to": "web"
+    },
+    {
+      "from": "mobile",
+      "to": "server",
+      "label": "REST"
+    },
+    {
+      "from": "web",
+      "to": "server",
+      "label": "REST"
+    },
+    {
+      "from": "cli",
+      "to": "server",
+      "label": "upload"
+    },
+    {
+      "from": "server",
+      "to": "db",
+      "label": "SQL"
+    },
+    {
+      "from": "server",
+      "to": "redis",
+      "label": "enqueue"
+    },
+    {
+      "from": "server",
+      "to": "files",
+      "label": "originals"
+    },
+    {
+      "from": "redis",
+      "to": "jobs"
+    },
+    {
+      "from": "jobs",
+      "to": "ml",
+      "label": "inference"
+    },
+    {
+      "from": "jobs",
+      "to": "files",
+      "label": "thumbnails"
+    },
+    {
+      "from": "server",
+      "to": "email",
+      "label": "notify"
+    }
+  ],
+  "ignore": [
+    "packages/plugin-sdk/**",
+    "packages/plugin-core/**",
+    "packages/sdk/**"
+  ]
+}

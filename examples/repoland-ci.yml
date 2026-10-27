@@ -1,0 +1,34 @@
+# Copy to .github/workflows/repoland.yml
+# - fails the PR if the architecture map no longer matches the code
+# - comments which parts the PR touches, with what depends on them
+name: repoland
+on:
+  pull_request:
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  map:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # impact needs the base branch history
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Map still matches the code
+        run: npx -y repoland check
+      - name: What this PR touches
+        run: |
+          npx -y repoland impact --base "origin/${{ github.base_ref }}" --md > impact.md
+          npx -y repoland impact --base "origin/${{ github.base_ref }}" -o repoland-impact.svg
+          cat impact.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Comment on the PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment "${{ github.event.pull_request.number }}" --body-file impact.md --edit-last || gh pr comment "${{ github.event.pull_request.number }}" --body-file impact.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: repoland-impact
+          path: repoland-impact.svg
